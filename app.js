@@ -5,7 +5,6 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 require('dotenv').config();
 var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
 const bodyParser = require('body-parser')
 var app = express();
 
@@ -43,5 +42,5 @@ app.use(function (err, req, res, next) {
 const host = '0.0.0.0';
 const port = 3001;
 app.listen(process.env.PORT || port, process.env.HOST || host, function () {
-  console.log("Server started.......");
+  console.log(`Server started at http://localhost:${process.env.PORT}`);
 });
