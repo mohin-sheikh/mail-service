@@ -6,8 +6,7 @@ const nodemailer = require('nodemailer'); // to send mail
 router.post('/', async function (req, res) {
   const to = req.body.to;
   const subject = req.body.subject;
-  const name = req.body.name;
-  const otp = req.body.otp;
+  const text = req.body.text;
   let mailTransporter = nodemailer.createTransport({
     host: "sg2plcpnl0109.prod.sin2.secureserver.net",
     auth: {
@@ -19,7 +18,7 @@ router.post('/', async function (req, res) {
     from: "noreply@broadstairs.in",
     to: to,
     subject: subject,
-    text: `Hey ${name} this is your OTP ${otp}. Don't share this otp with anyone.`
+    html: text,
   };
   await mailTransporter.sendMail(mailDetails, function (err) {
     if (err) {
@@ -27,7 +26,7 @@ router.post('/', async function (req, res) {
       return res.status(500).send("Error While Sending Mail!")
     } else {
       console.log('Email sent successfully');
-      return res.send("Email sent successfully")
+      return res.send(`e-mail sent successfully to ${to}.`)
     }
   });
 });
