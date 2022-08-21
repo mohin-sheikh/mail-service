@@ -3,11 +3,12 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-
+require('dotenv').config();
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 const bodyParser = require('body-parser')
 var app = express();
+
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -42,6 +43,6 @@ app.use(function (err, req, res, next) {
 });
 const host = '0.0.0.0';
 const port = 3001;
-app.listen(port, host, function () {
+app.listen(process.env.PORT || port, process.env.HOST || host, function () {
   console.log("Server started.......");
 });
