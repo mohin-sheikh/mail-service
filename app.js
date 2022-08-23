@@ -38,6 +38,7 @@ app.use(function (err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
+
 const host = '0.0.0.0';
 const port = 3001;
 app.listen(process.env.PORT || port, process.env.HOST || host, function () {
