@@ -5,20 +5,19 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 require('dotenv').config();
 var indexRouter = require('./routes/index');
-const bodyParser = require('body-parser')
+var bodyParser = require("body-parser");
+var fileUpload = require('express-fileupload')
 var app = express();
 
-
+app.use(fileUpload({ createParentPath: true }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.json())
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
 app.use(logger('dev'));
-app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
