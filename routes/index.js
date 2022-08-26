@@ -55,7 +55,7 @@ router.post('/mail/time-set', async function (req, res) {
     await mailTransporter.sendMail(mailDetails, function (err) {
       if (err) {
         console.log(err);
-        return res.status(500).send("Error While Sending Mail!")
+        // return res.status(500).send("Error While Sending Mail!")
       } else {
         console.log('Email sent successfully');
       }
