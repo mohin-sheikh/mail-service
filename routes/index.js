@@ -1,9 +1,9 @@
 var express = require('express');
 var router = express.Router();
-let cron = require('node-cron');
+const schedule = require('node-schedule');
 const nodemailer = require('nodemailer'); // to send mail
 
-/* GET home page. */
+
 router.post('/mail', async function (req, res) {
   const to = req.body.to;
   const subject = req.body.subject;
@@ -49,17 +49,20 @@ router.post('/mail/time-set', async function (req, res) {
     subject: subject,
     html: html,
   };
-  cron.schedule('* * * * *', async () => {
+
+  const job = schedule.scheduleJob('*/1 * * * *', async function () {
+    console.log('The world is going to end today.');
     await mailTransporter.sendMail(mailDetails, function (err) {
       if (err) {
         console.log(err);
         return res.status(500).send("Error While Sending Mail!")
       } else {
         console.log('Email sent successfully');
-        return res.send(`e-mail sent successfully to ${to}.`)
       }
     });
-  })
+    job.cancel();
+  });
+  return res.send(`e-mail sent successfully to ${to}.`)
 });
 
 
