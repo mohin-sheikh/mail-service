@@ -9,14 +9,16 @@ router.post('/mail', async function (req, res) {
   const subject = req.body.subject;
   const html = req.body.html;
   let mailTransporter = nodemailer.createTransport({
-    host: process.env.EMAIL_HOST,
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true,
     auth: {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASSWORD
     }
   });
   let mailDetails = {
-    from: "noreply@ventures.in",
+    from: 'TEST USER <noreply@ventures.com>',
     to: to,
     subject: subject,
     html: html,
@@ -32,12 +34,14 @@ router.post('/mail', async function (req, res) {
   });
 });
 
-router.post('/mail/time-set', async function (req, res) {
+router.post('/mail/schedule', async function (req, res) {
   const to = req.body.to;
   const subject = req.body.subject;
   const html = req.body.html;
   let mailTransporter = nodemailer.createTransport({
-    host: process.env.EMAIL_HOST,
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true,
     auth: {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASSWORD
@@ -49,13 +53,14 @@ router.post('/mail/time-set', async function (req, res) {
     subject: subject,
     html: html,
   };
-
-  const job = schedule.scheduleJob('*/1 * * * *', async function () {
-    console.log('The world is going to end today.');
+  let minute = req.body.minute === undefined ? "*" : req.body.minute;
+  let hour = req.body.hour === undefined ? "*" : req.body.hour;
+  let day = req.body.day === undefined ? "*" : req.body.day;
+  let month = req.body.month === undefined ? "*" : req.body.month;
+  const job = schedule.scheduleJob(`${minute} ${hour} ${day} ${month} *`, async function () {
     await mailTransporter.sendMail(mailDetails, function (err) {
       if (err) {
         console.log(err);
-        // return res.status(500).send("Error While Sending Mail!")
       } else {
         console.log('Email sent successfully');
       }
@@ -105,7 +110,9 @@ router.post('/mail/attachment', async (req, res) => {
       };
     }
     const transporter = nodemailer.createTransport({
-      host: process.env.EMAIL_HOST,
+      host: 'smtp.gmail.com',
+      port: 465,
+      secure: true,
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASSWORD
