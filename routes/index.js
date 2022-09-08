@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 const schedule = require('node-schedule');
-const nodemailer = require('nodemailer');
+const nodemailer = require('nodemailer'); // to send mail
 
 
 router.post('/mail', async function (req, res) {
