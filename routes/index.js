@@ -161,6 +161,7 @@ router.post('/text-message', async (req, res) => {
       })
       .catch((err) => {
         console.log(err.message);
+        return res.send(err);
       })
   } catch (err) {
     console.log(err);
