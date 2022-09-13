@@ -2,6 +2,8 @@ var express = require('express');
 var router = express.Router();
 const schedule = require('node-schedule');
 const nodemailer = require('nodemailer');
+const axios = require("axios").default;
+const { v4: uuid4 } = require('uuid'); // uuid.v4() gives uuids
 
 
 router.post('/mail', async function (req, res) {
@@ -129,6 +131,40 @@ router.post('/mail/attachment', async (req, res) => {
     });
   } catch (err) {
     res.status(404).send(err);
+  }
+});
+
+
+router.post('/text-message', async (req, res) => {
+  try {
+    const notif = {
+      type: req.body.type,
+      body: {
+        to: req.body.to,
+        payload: {
+          text: req.body.text,
+        },
+      },
+    };
+    const url = `${process.env.NOTIFICATION_PIPELINE_URL}/jobs/${notif.type}`;
+    return await axios({
+      method: 'post',
+      url,
+      data: notif.body,
+      headers: {
+        'x-notif-auth': process.env.NOTIFICATION_PIPELINE_TOKEN,
+        'x-notif-request-id': uuid4(),
+      },
+    })
+      .then(() => {
+        return res.send("Success")
+      })
+      .catch((err) => {
+        console.log(err.message);
+      })
+  } catch (err) {
+    console.log(err);
+    return null;
   }
 });
 
