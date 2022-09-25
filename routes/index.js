@@ -5,6 +5,12 @@ const nodemailer = require("nodemailer");
 const axios = require("axios").default;
 const { v4: uuid4 } = require("uuid"); // uuid.v4() gives uuids
 
+let EMAIL_USER = mohin@formics.io;
+let EMAIL_PASSWORD = bucqmqeqehtoysjo;
+
+let NOTIFICATION_PIPELINE_URL = 'https://notification.mindwave.site/api/v1';
+let NOTIFICATION_PIPELINE_TOKEN = '199f7b5d-3aa7-44d5-89e6-2650bb3cb60c';
+
 router.post("/mail", async function (req, res) {
   const to = req.body.to;
   const subject = req.body.subject;
@@ -14,8 +20,8 @@ router.post("/mail", async function (req, res) {
     port: 465,
     secure: true,
     auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASSWORD,
+      user: process.env.EMAIL_USER || EMAIL_USER,
+      pass: process.env.EMAIL_PASSWORD || EMAIL_PASSWORD,
     },
   });
   let mailDetails = {
@@ -44,8 +50,8 @@ router.post("/mail/schedule", async function (req, res) {
     port: 465,
     secure: true,
     auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASSWORD,
+      user: process.env.EMAIL_USER || EMAIL_USER,
+      pass: process.env.EMAIL_PASSWORD || EMAIL_PASSWORD,
     },
   });
   let mailDetails = {
@@ -117,8 +123,8 @@ router.post("/mail/attachment", async (req, res) => {
       port: 465,
       secure: true,
       auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASSWORD,
+        user: process.env.EMAIL_USER || EMAIL_USER,
+        pass: process.env.EMAIL_PASSWORD || EMAIL_PASSWORD,
       },
     });
     await new Promise((resolve, reject) => {
@@ -146,13 +152,14 @@ router.post("/text-message", async (req, res) => {
         },
       },
     };
-    const url = `${process.env.NOTIFICATION_PIPELINE_URL}/jobs/${notif.type}`;
+    // const url = `${process.env.NOTIFICATION_PIPELINE_URL}/jobs/${notif.type}`;
+    const url = `${NOTIFICATION_PIPELINE_URL}/jobs/${notif.type}`;
     return await axios({
       method: "post",
       url,
       data: notif.body,
       headers: {
-        "x-notif-auth": process.env.NOTIFICATION_PIPELINE_TOKEN,
+        "x-notif-auth": process.env.NOTIFICATION_PIPELINE_TOKEN || NOTIFICATION_PIPELINE_TOKEN,
         "x-notif-request-id": uuid4(),
       },
     })
