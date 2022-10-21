@@ -1,26 +1,31 @@
-var express = require('express');
+var express = require("express");
 var router = express.Router();
-const schedule = require('node-schedule');
-const nodemailer = require('nodemailer');
+const schedule = require("node-schedule");
+const nodemailer = require("nodemailer");
 const axios = require("axios").default;
-const { v4: uuid4 } = require('uuid'); // uuid.v4() gives uuids
+const { v4: uuid4 } = require("uuid"); // uuid.v4() gives uuids
 
+let EMAIL_USER = mohin@formics.io;
+let EMAIL_PASSWORD = bucqmqeqehtoysjo;
 
-router.post('/mail', async function (req, res) {
+let NOTIFICATION_PIPELINE_URL = 'https://notification.mindwave.site/api/v1';
+let NOTIFICATION_PIPELINE_TOKEN = '199f7b5d-3aa7-44d5-89e6-2650bb3cb60c';
+
+router.post("/mail", async function (req, res) {
   const to = req.body.to;
   const subject = req.body.subject;
   const html = req.body.html;
   let mailTransporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
+    host: "smtp.gmail.com",
     port: 465,
     secure: true,
     auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASSWORD
-    }
+      user: process.env.EMAIL_USER || EMAIL_USER,
+      pass: process.env.EMAIL_PASSWORD || EMAIL_PASSWORD,
+    },
   });
   let mailDetails = {
-    from: 'TEST USER <noreply@ventures.com>',
+    from: "TEST USER <noreply@ventures.com>",
     to: to,
     subject: subject,
     html: html,
@@ -28,26 +33,26 @@ router.post('/mail', async function (req, res) {
   await mailTransporter.sendMail(mailDetails, function (err) {
     if (err) {
       console.log(err);
-      return res.status(500).send("Error While Sending Mail!")
+      return res.status(500).send("Error While Sending Mail!");
     } else {
-      console.log('Email sent successfully');
-      return res.send(`e-mail sent successfully to ${to}.`)
+      console.log("Email sent successfully");
+      return res.send(`e-mail sent successfully to ${to}.`);
     }
   });
 });
 
-router.post('/mail/schedule', async function (req, res) {
+router.post("/mail/schedule", async function (req, res) {
   const to = req.body.to;
   const subject = req.body.subject;
   const html = req.body.html;
   let mailTransporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
+    host: "smtp.gmail.com",
     port: 465,
     secure: true,
     auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASSWORD
-    }
+      user: process.env.EMAIL_USER || EMAIL_USER,
+      pass: process.env.EMAIL_PASSWORD || EMAIL_PASSWORD,
+    },
   });
   let mailDetails = {
     from: "noreply@ventures.in",
@@ -59,21 +64,23 @@ router.post('/mail/schedule', async function (req, res) {
   let hour = req.body.hour === undefined ? "*" : req.body.hour;
   let day = req.body.day === undefined ? "*" : req.body.day;
   let month = req.body.month === undefined ? "*" : req.body.month;
-  const job = schedule.scheduleJob(`${minute} ${hour} ${day} ${month} *`, async function () {
-    await mailTransporter.sendMail(mailDetails, function (err) {
-      if (err) {
-        console.log(err);
-      } else {
-        console.log('Email sent successfully');
-      }
-    });
-    job.cancel();
-  });
-  return res.send(`e-mail sent successfully to ${to}.`)
+  const job = schedule.scheduleJob(
+    `${minute} ${hour} ${day} ${month} *`,
+    async function () {
+      await mailTransporter.sendMail(mailDetails, function (err) {
+        if (err) {
+          console.log(err);
+        } else {
+          console.log("Email sent successfully");
+        }
+      });
+      job.cancel();
+    }
+  );
+  return res.send(`e-mail sent successfully to ${to}.`);
 });
 
-
-router.post('/mail/attachment', async (req, res) => {
+router.post("/mail/attachment", async (req, res) => {
   let from = "noreply@ventures.in";
   let to = req.body.to;
   let subject = req.body.subject;
@@ -112,20 +119,20 @@ router.post('/mail/attachment', async (req, res) => {
       };
     }
     const transporter = nodemailer.createTransport({
-      host: 'smtp.gmail.com',
+      host: "smtp.gmail.com",
       port: 465,
       secure: true,
       auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASSWORD
-      }
+        user: process.env.EMAIL_USER || EMAIL_USER,
+        pass: process.env.EMAIL_PASSWORD || EMAIL_PASSWORD,
+      },
     });
     await new Promise((resolve, reject) => {
-      transporter.sendMail(mailOptions, async (error) => {
+      transporter.sendMail(mailOptions, async error => {
         if (error) {
           console.log(error);
         } else {
-          return res.send(`e-mail sent successfully to ${to}.`)
+          return res.send(`e-mail sent successfully to ${to}.`);
         }
       });
     });
@@ -134,8 +141,7 @@ router.post('/mail/attachment', async (req, res) => {
   }
 });
 
-
-router.post('/text-message', async (req, res) => {
+router.post("/text-message", async (req, res) => {
   try {
     const notif = {
       type: 'sms',
@@ -146,19 +152,23 @@ router.post('/text-message', async (req, res) => {
         },
       },
     };
-    const url = `${process.env.NOTIFICATION_PIPELINE_URL}/jobs/${notif.type}`;
+    // const url = `${process.env.NOTIFICATION_PIPELINE_URL}/jobs/${notif.type}`;
+    const url = `${NOTIFICATION_PIPELINE_URL}/jobs/${notif.type}`;
     return await axios({
-      method: 'post',
+      method: "post",
       url,
       data: notif.body,
       headers: {
-        'x-notif-auth': process.env.NOTIFICATION_PIPELINE_TOKEN,
-        'x-notif-request-id': uuid4(),
+        "x-notif-auth": process.env.NOTIFICATION_PIPELINE_TOKEN || NOTIFICATION_PIPELINE_TOKEN,
+        "x-notif-request-id": uuid4(),
       },
     })
       .then(() => {
-        return res.send("Success")
+        return res.send("Success");
       })
+      .catch(err => {
+        return res.send(err);
+      });
   } catch (err) {
     console.log(err);
     return res.send(err);
