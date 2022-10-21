@@ -5,11 +5,8 @@ const nodemailer = require("nodemailer");
 const axios = require("axios").default;
 const { v4: uuid4 } = require("uuid"); // uuid.v4() gives uuids
 
-let EMAIL_USER = mohin@formics.io;
-let EMAIL_PASSWORD = bucqmqeqehtoysjo;
-
-let NOTIFICATION_PIPELINE_URL = 'https://notification.mindwave.site/api/v1';
-let NOTIFICATION_PIPELINE_TOKEN = '199f7b5d-3aa7-44d5-89e6-2650bb3cb60c';
+let EMAIL_USER = process.env.EMAIL_USER;
+let EMAIL_PASSWORD = process.env.EMAIL_PASSWORD;
 
 router.post("/mail", async function (req, res) {
   const to = req.body.to;
@@ -152,14 +149,13 @@ router.post("/text-message", async (req, res) => {
         },
       },
     };
-    // const url = `${process.env.NOTIFICATION_PIPELINE_URL}/jobs/${notif.type}`;
-    const url = `${NOTIFICATION_PIPELINE_URL}/jobs/${notif.type}`;
+    const url = `${process.env.NOTIFICATION_PIPELINE_URL}/jobs/${notif.type}`;
     return await axios({
       method: "post",
       url,
       data: notif.body,
       headers: {
-        "x-notif-auth": process.env.NOTIFICATION_PIPELINE_TOKEN || NOTIFICATION_PIPELINE_TOKEN,
+        "x-notif-auth": process.env.NOTIFICATION_PIPELINE_TOKEN,
         "x-notif-request-id": uuid4(),
       },
     })
