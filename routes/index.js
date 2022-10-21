@@ -138,7 +138,7 @@ router.post('/mail/attachment', async (req, res) => {
 router.post('/text-message', async (req, res) => {
   try {
     const notif = {
-      type: req.body.type,
+      type: 'sms',
       body: {
         to: req.body.to,
         payload: {
