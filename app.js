@@ -1,13 +1,13 @@
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+const createError = require('http-errors');
+const express = require('express');
+const path = require('path');
+const cookieParser = require('cookie-parser');
+const logger = require('morgan');
 require('dotenv').config();
-var indexRouter = require('./routes/index');
-var bodyParser = require("body-parser");
-var fileUpload = require('express-fileupload')
-var app = express();
+const indexRouter = require('./routes/index');
+const bodyParser = require("body-parser");
+const fileUpload = require('express-fileupload')
+const app = express();
 
 app.use(fileUpload({ createParentPath: true }));
 app.use(bodyParser.json());
@@ -30,17 +30,17 @@ app.use(function (req, res, next) {
 });
 
 // error handler
-app.use(function (err, req, res, next) {
+app.use(function (err, req, res) {
   // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
+  res['locals'].message = err['message'];
+  res['locals'].error = req.app.get('env') === 'development' ? err : {};
 
-  res.status(err.status || 500);
-  res.render('error');
+  res['status'](err['status'] || 500);
+  res['render']('error');
 });
 
-const host = '0.0.0.0';
-const port = 3001;
-app.listen(process.env.PORT || port, process.env.HOST || host, function () {
+const host = process.env.HOST || '0.0.0.0';
+const port = process.env.PORT || 1020;
+app.listen(port, host, () => {
   console.log(`Server started at http://localhost:${process.env.PORT}`);
 });
